@@ -5,6 +5,18 @@
         WindowStyle="None" Visibility="Visible" WindowStartupLocation="CenterScreen" Opacity="1"
         MouseLeftButtonDown="Window_MouseLeftButtonDown" AllowsTransparency="True" SizeToContent="WidthAndHeight"
         Title="Missing Files V2">
+    <Window.Resources>
+        <Style x:Key="NewButtonStyle" TargetType="{x:Type Button}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Keres}" Value="true">
+                    <Setter Property="IsEnabled" Value="False"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Keres}" Value="false">
+                    <Setter Property="IsEnabled" Value="True"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
     <Window.ContextMenu>
         <ContextMenu BorderBrush="Black" Background="Aquamarine" BorderThickness="1,1,1,1">
             <MenuItem Header="Transparent" Click="execTransparencyMenuItem" IsCheckable="True" IsChecked="False"/>
@@ -31,76 +43,44 @@
                     <RowDefinition Height="40*"/>
                 </Grid.RowDefinitions>
                 <TextBlock Text="Directory Path: " VerticalAlignment="Center" HorizontalAlignment="Right" Height="16" Margin="0,12,5,12" Width="81" />
-                <TextBox x:Name="startdir" Text="{Binding BaseDir, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="0" Margin="10,10" Grid.ColumnSpan="4" />
-                <Button Content="Browse" Click="execBrowse" Grid.Column="5" Grid.Row="0" Margin="10,10">
-                    <Button.Style>
-                        <Style TargetType="Button">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Keres}" Value="true">
-                                    <Setter Property="IsEnabled" Value="False"></Setter>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Keres}" Value="false">
-                                    <Setter Property="IsEnabled" Value="True"></Setter>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
+                <TextBox x:Name="startdir" Text="{Binding Path=BaseDir, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="0" Margin="10,10" Grid.ColumnSpan="4" />
+
+                <Button Content="Browse" Click="execBrowse" Grid.Column="5" Grid.Row="0" Margin="10,10" Style="{StaticResource NewButtonStyle}" />
+
                 <!-- {Binding FilePath} {Binding FilesCount} -->
                 <TextBlock Text="DB_host: " Grid.Column="0" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Right" Height="16" Margin="5" Width="49" />
-                <TextBox Text="{Binding Srv, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="1" Margin="5" />
+                <TextBox Text="{Binding Path=Srv, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="1" Margin="5" />
                 <TextBlock Text="DB Name " Grid.Column="2" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Right" Height="16" Margin="5" Width="54" />
-                <TextBox Text="{Binding DB_name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="3" Grid.Row="1" Margin="5" />
+                <TextBox Text="{Binding Path=DB_name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="3" Grid.Row="1" Margin="5" />
                 <TextBlock Text="Table name: " Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Right" Height="16" Margin="0,12,4,6" Width="67" Grid.Column="4" />
-                <TextBox Text="{Binding DB_Table, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="5" Grid.Row="1" Margin="5" />
-                <TextBlock x:Name="elerut" Text="" Grid.Column="4" Grid.Row="5" VerticalAlignment="Center" HorizontalAlignment="Right" 
-                           Height="36" Margin="0,4,5,0" Width="226" Grid.ColumnSpan="2" TextWrapping="Wrap" />
+                <TextBox Text="{Binding Path=DB_Table, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="5" Grid.Row="1" Margin="5" />
                 <ListView ItemsSource="{Binding Errorlist_dir, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="4" Margin="10,10,10,0" Grid.ColumnSpan="3"/>
                 <ListView ItemsSource="{Binding Errorlist_db, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Grid.Row="4" Margin="10,10,10,0" Grid.ColumnSpan="3" Grid.Column="3"/>
                 <TextBlock Text="Missing in folder (it is in DB): " Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Right" Height="16" Margin="5" Width="154" />
-                <TextBlock Text="Found files in folder: " Grid.Column="3" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Right" Height="16" Margin="5" Width="187" Grid.ColumnSpan="2" />
-                <TextBlock Text="{Binding Missing, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" Grid.Column="2" Grid.Row="3" 
-                           VerticalAlignment="Center" HorizontalAlignment="center" Height="16" Margin="5" Width="6" />
-                <TextBlock Text="{Binding Found, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" Grid.Column="5" Grid.Row="3" 
-                           VerticalAlignment="Center" HorizontalAlignment="center" Height="16" Margin="5" Width="6" />
-                <Button Content="Start" Click="execStart" Grid.Row="5" Margin="10">
-                    <Button.Style>
-                        <Style TargetType="{x:Type Button}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Keres}" Value="true">
-                                    <Setter Property="IsEnabled" Value="False"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Keres}" Value="false">
-                                    <Setter Property="IsEnabled" Value="True"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
+                <TextBlock Text="Found files in folder: " Grid.Column="3" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Right" Height="16" Margin="0,8,5,8" Width="116" />
+                <Label Content="{Binding Path=Missing, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="2" Grid.Row="3" 
+                           VerticalAlignment="Center" HorizontalAlignment="center" Height="25" Margin="10" Width="auto" />
+                <Label Content="{Binding Path=Found, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="4" Grid.Row="3" 
+                           VerticalAlignment="Center" HorizontalAlignment="center" Height="25" Margin="10" Width="auto" />
+
+                <Button Content="Start" Click="execStart" Grid.Row="5" Margin="10" Style="{StaticResource NewButtonStyle}" />
+
                 <TextBlock Text="Rows in DB: " Grid.Column="2" Grid.Row="5" VerticalAlignment="Center" HorizontalAlignment="Right" Height="16" Margin="0,14,10,10" Width="auto" />
-                <TextBlock Text="{Binding DbRows}" Grid.Column="3" Grid.Row="5" VerticalAlignment="Center" HorizontalAlignment="Right" Height="16" Margin="0,14,10,10" Width="auto" />
+                <Label Content="0" Grid.Column="3" Grid.Row="5" VerticalAlignment="Center" HorizontalAlignment="Left" Height="28" Margin="5,5,0,0" Width="auto" MinWidth="25"/>
+
                 <TextBlock Text="Port number: " Grid.Column="0" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Right" Height="16" Margin="0,8,5,7" Width="auto" />
-                <TextBox Text="{Binding Port, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="2" Margin="5" />
+                <TextBox Text="{Binding Path=Port, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="1" Grid.Row="2" Margin="5" />
                 <TextBlock Text="LogFile path: " Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Right" Height="16" Margin="5" Width="auto" />
-                <TextBox Text="{Binding LogFileDir, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="3" Grid.Row="2" Margin="5" Grid.ColumnSpan="2" />
-                <Button Content="Log File dir." Click="execBrowse" Grid.Column="5" Grid.Row="2" Margin="5">
-                    <Button.Style>
-                        <Style TargetType="{x:Type Button}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Keres}" Value="true">
-                                    <Setter Property="IsEnabled" Value="False"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Keres}" Value="false">
-                                    <Setter Property="IsEnabled" Value="True"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
+                <TextBox x:Name="LogFile" Text="{Binding LogFileDir, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Grid.Column="3" Grid.Row="2" Margin="5" Grid.ColumnSpan="2" />
+                <Button Content="Log File dir." Click="execLogFilePath" Grid.Column="5" Grid.Row="2" Margin="5" Style="{StaticResource NewButtonStyle}" />
+
             </Grid>
             <WrapPanel>
                 <TextBlock Text="Using: mouse leftclick: move window; rightclick: menu" HorizontalAlignment="Center" 
                            TextWrapping="Wrap" Height="21" VerticalAlignment="Bottom"/>
+                <TextBlock x:Name="elerut" Text="" VerticalAlignment="Center" HorizontalAlignment="Right" 
+                           Height="auto" Margin="150,5" Width="auto" Grid.ColumnSpan="2" TextWrapping="Wrap" />
+
             </WrapPanel>
         </StackPanel>
     </Border>

@@ -268,6 +268,34 @@ namespace MissingFiles_V2
             }
         }
 
+        private void execLogFilePath(object sender, RoutedEventArgs e)
+        {
+            using (CommonOpenFileDialog dlg = new CommonOpenFileDialog())
+            {
+
+                string currentDirectory = @"&:\";
+                dlg.Title = "Select folder";
+                dlg.InitialDirectory = currentDirectory;
+
+                dlg.AddToMostRecentlyUsedList = false;
+                dlg.AllowNonFileSystemItems = false;
+                dlg.DefaultDirectory = currentDirectory;
+                dlg.EnsureFileExists = true;
+                dlg.EnsurePathExists = true;
+                dlg.EnsureReadOnly = false;
+                dlg.EnsureValidNames = true;
+                dlg.Multiselect = false;
+                dlg.ShowPlacesList = true;
+                dlg.IsFolderPicker = true;
+                CommonFileDialogResult result = dlg.ShowDialog();
+                if (result.ToString().ToLower() == "ok")
+                {
+                    LogFileDir = dlg.FileName;
+                    LogFile.Text = LogFileDir;
+                }
+            }
+        }
+
         private void execStart(object sender, RoutedEventArgs e)
         {
             Keres = true;
