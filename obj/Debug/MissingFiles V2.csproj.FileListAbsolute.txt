@@ -1,0 +1,16 @@
+c:\users\tpa\documents\visual studio 2013\Projects\MissingFiles V2\bin\Debug\MissingFiles V2.exe.config
+c:\users\tpa\documents\visual studio 2013\Projects\MissingFiles V2\obj\Debug\MissingFiles V2.csprojResolveAssemblyReference.cache
+c:\users\tpa\documents\visual studio 2013\Projects\MissingFiles V2\obj\Debug\MainWindow.baml
+c:\users\tpa\documents\visual studio 2013\Projects\MissingFiles V2\obj\Debug\MainWindow.g.cs
+c:\users\tpa\documents\visual studio 2013\Projects\MissingFiles V2\obj\Debug\App.g.cs
+c:\users\tpa\documents\visual studio 2013\Projects\MissingFiles V2\obj\Debug\MissingFiles V2_MarkupCompile.cache
+c:\users\tpa\documents\visual studio 2013\Projects\MissingFiles V2\obj\Debug\MissingFiles V2.g.resources
+c:\users\tpa\documents\visual studio 2013\Projects\MissingFiles V2\obj\Debug\MissingFiles_V2.Properties.Resources.resources
+c:\users\tpa\documents\visual studio 2013\Projects\MissingFiles V2\obj\Debug\MissingFiles V2.csproj.GenerateResource.Cache
+c:\users\tpa\documents\visual studio 2013\Projects\MissingFiles V2\bin\Debug\MissingFiles V2.exe
+c:\users\tpa\documents\visual studio 2013\Projects\MissingFiles V2\bin\Debug\MissingFiles V2.pdb
+c:\users\tpa\documents\visual studio 2013\Projects\MissingFiles V2\bin\Debug\Microsoft.WindowsAPICodePack.dll
+c:\users\tpa\documents\visual studio 2013\Projects\MissingFiles V2\bin\Debug\Microsoft.WindowsAPICodePack.Shell.dll
+c:\users\tpa\documents\visual studio 2013\Projects\MissingFiles V2\bin\Debug\MySql.Data.dll
+c:\users\tpa\documents\visual studio 2013\Projects\MissingFiles V2\obj\Debug\MissingFiles V2.exe
+c:\users\tpa\documents\visual studio 2013\Projects\MissingFiles V2\obj\Debug\MissingFiles V2.pdb
