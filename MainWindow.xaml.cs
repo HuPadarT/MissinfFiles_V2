@@ -24,36 +24,50 @@ namespace MissingFiles_V2
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private string _srv = "192.168.67.17";
-        private Int64 _filesCount;
-        private Int64 _dbRows;
-        private Int64 _found;
-        private Int64 _missing;
+        private static Int64 _missing = 0;
+        private static Int64 _fullcnt = 0;
+        private static Int64 _dbRowsCount = 0;
+        private static Int64 _filesInFolder = 0;
         private int _prt = 3312;
         private string _dB_felh = "tpa";
+        private string _progressLine = string.Empty;
         private string _dB_jsz = "6J3v3z";
         private string _dB_name = "franke_easy_final";
         private string _dB_Table = "w2s_einkauf";
         //private string repString = "";
         private string[] extension = new string[] { ".tif", ".pdf", ".doc", ".fax", ".txt" };
-        private ObservableCollection<string> _errorlist_dir = new ObservableCollection<string>();
-        private ObservableCollection<string> _found_files = new ObservableCollection<string>();
+        private static ObservableCollection<string> _errorlist_dir = new ObservableCollection<string>();
+        private static ObservableCollection<string> _found_files = new ObservableCollection<string>();
         private string _baseDir;
         private string _logFileDir;
-        private bool _keres;
-        private List<string> datarows = new List<string>();
+        private static bool _keres;
+        private static List<string> datarows = new List<string>();
 
         public MainWindow()
         {
             InitializeComponent();
-            LogFileDir = @"C:\temp";
-            elerut.Text = "Choose target directory.";
             this.DataContext = this;
+            LogFileDir = @"C:\temp";
+            ProgressLine = "Choose target directory.";
         }
 
         #region program members
+        public string ProgressLine
+        {
+            get
+            {
+                return this._progressLine;
+            }
+            set
+            {
+                this._progressLine = value;
+                this.RaisePropertyChanged("ProgressLine");
+            }
+        }
+
         public string LogFileDir
         {
             get
@@ -106,29 +120,16 @@ namespace MissingFiles_V2
             }
         }
 
-        public Int64 FilesCount
+        public Int64 DbRowsCount
         {
             get
             {
-                return this._filesCount;
+                return _dbRowsCount;
             }
             set
             {
-                this._filesCount = value;
-                this.RaisePropertyChanged("FilesCount");
-            }
-        }
-
-        public Int64 Found
-        {
-            get
-            {
-                return this._found;
-            }
-            set
-            {
-                this._found = value;
-                this.RaisePropertyChanged("Found");
+                _dbRowsCount = value;
+                RaisePropertyChanged("DbRowsCount");
             }
         }
 
@@ -136,31 +137,44 @@ namespace MissingFiles_V2
         {
             get
             {
-                return this._missing;
+                return _missing;
             }
             set
             {
-                this._missing = value;
-                this.RaisePropertyChanged("Missing");
+                _missing = value;
+                RaisePropertyChanged("Missing");
             }
         }
 
-        public Int64 DbRows
+        public Int64 Fullcnt
         {
             get
             {
-                return this._dbRows;
+                return _fullcnt;
             }
             set
             {
-                this._dbRows = value;
-                this.RaisePropertyChanged("DbRows");
+                _fullcnt = value;
+                RaisePropertyChanged("Fullcnt");
+            }
+        }
+
+        public Int64 FilesInFolder
+        {
+            get
+            {
+                return _filesInFolder;
+            }
+            set
+            {
+                _filesInFolder = value;
+                RaisePropertyChanged("FilesInFolder");
             }
         }
 
         public ObservableCollection<string> Errorlist_dir
         {
-            get { return this._errorlist_dir; }
+            get { return _errorlist_dir; }
         }
 
         private void Add_Errorlist_dir(string item)
@@ -174,7 +188,7 @@ namespace MissingFiles_V2
 
         public ObservableCollection<string> Found_files
         {
-            get { return this._found_files; }
+            get { return _found_files; }
         }
 
         private void Add_Found_files(string item)
@@ -216,15 +230,45 @@ namespace MissingFiles_V2
         {
             get
             {
-                return this._keres;
+                return _keres;
             }
             set
             {
-                this._keres = value;
-                this.RaisePropertyChanged("keres");
+                _keres = value;
+                RaisePropertyChanged("keres");
             }
         }
         #endregion
+
+        private string BrowseFolder()
+        {
+            using (CommonOpenFileDialog dlg = new CommonOpenFileDialog())
+            {
+
+                string currentDirectory = @"&:\";
+                dlg.Title = "Select folder";
+                dlg.InitialDirectory = currentDirectory;
+
+                dlg.AddToMostRecentlyUsedList = false;
+                dlg.AllowNonFileSystemItems = false;
+                dlg.DefaultDirectory = currentDirectory;
+                dlg.EnsureFileExists = true;
+                dlg.EnsurePathExists = true;
+                dlg.EnsureReadOnly = false;
+                dlg.EnsureValidNames = true;
+                dlg.Multiselect = false;
+                dlg.ShowPlacesList = true;
+                dlg.IsFolderPicker = true;
+                CommonFileDialogResult result = dlg.ShowDialog();
+                if (result.ToString().ToLower() == "ok")
+                {
+                    //BaseDir = Path.GetFullPath(temp).Replace(Path.GetFileName(temp), string.Empty);
+                    // MessageBox.Show("Kiválasztott file neve: " + dlg.FileName);
+                    return dlg.FileName;
+                }
+                return "";
+            }
+        }
 
         #region mouse click command
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -239,80 +283,35 @@ namespace MissingFiles_V2
 
         private void execBrowse(object sender, RoutedEventArgs e)
         {
-            using (CommonOpenFileDialog dlg = new CommonOpenFileDialog())
-            {
-
-                string currentDirectory = @"&:\";
-                dlg.Title = "Select folder";
-                dlg.InitialDirectory = currentDirectory;
-
-                dlg.AddToMostRecentlyUsedList = false;
-                dlg.AllowNonFileSystemItems = false;
-                dlg.DefaultDirectory = currentDirectory;
-                dlg.EnsureFileExists = true;
-                dlg.EnsurePathExists = true;
-                dlg.EnsureReadOnly = false;
-                dlg.EnsureValidNames = true;
-                dlg.Multiselect = false;
-                dlg.ShowPlacesList = true;
-                dlg.IsFolderPicker = true;
-                CommonFileDialogResult result = dlg.ShowDialog();
-                if (result.ToString().ToLower() == "ok")
-                {
-                    BaseDir = dlg.FileName;
-                    //BaseDir = Path.GetFullPath(temp).Replace(Path.GetFileName(temp), string.Empty);
-                    this.startdir.Text = BaseDir;
-                    // MessageBox.Show("Kiválasztott file neve: " + dlg.FileName);
-                    elerut.Text = "Press start button.";
-                }
-            }
+            string dir = BrowseFolder();
+            this.startdir.Text = dir;
+            ProgressLine = "Press start button.";
         }
 
         private void execLogFilePath(object sender, RoutedEventArgs e)
         {
-            using (CommonOpenFileDialog dlg = new CommonOpenFileDialog())
-            {
+            string dir = BrowseFolder();
+            LogFileDir = dir;
 
-                string currentDirectory = @"&:\";
-                dlg.Title = "Select folder";
-                dlg.InitialDirectory = currentDirectory;
-
-                dlg.AddToMostRecentlyUsedList = false;
-                dlg.AllowNonFileSystemItems = false;
-                dlg.DefaultDirectory = currentDirectory;
-                dlg.EnsureFileExists = true;
-                dlg.EnsurePathExists = true;
-                dlg.EnsureReadOnly = false;
-                dlg.EnsureValidNames = true;
-                dlg.Multiselect = false;
-                dlg.ShowPlacesList = true;
-                dlg.IsFolderPicker = true;
-                CommonFileDialogResult result = dlg.ShowDialog();
-                if (result.ToString().ToLower() == "ok")
-                {
-                    LogFileDir = dlg.FileName;
-                    LogFile.Text = LogFileDir;
-                }
-            }
         }
 
         private void execStart(object sender, RoutedEventArgs e)
         {
             Keres = true;
+            InitCounters();
             if (_dB_Table == string.Empty)
             {
-                elerut.Text = "Please enter data table name!";
+                ProgressLine = "Please enter data table name!";
                 return;
             }
             if (_dB_name == string.Empty)
             {
-                elerut.Text = "Please enter data base name!";
+                ProgressLine = "Please enter data base name!";
                 return;
             }
 
-            _found_files.Clear();
-            _errorlist_dir.Clear();
-            elerut.Text = "Reading Data Table...";
+            ProgressLine = "Reading Data Table...";
+            string f_name = BaseDir.Replace("\\", "_") + ".txt";
             Task.Factory.StartNew(() =>
             {
                 Application.Current.Dispatcher.Invoke(() =>
@@ -325,24 +324,75 @@ namespace MissingFiles_V2
 
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
                 {
-                    elerut.Text = "Reading files...";
+                    ProgressLine = "Reading files...";
                 }));
 
-                List<string> files = Directory.EnumerateFiles(BaseDir, "*.*", SearchOption.AllDirectories).Where(
-                                    s => s.EndsWith(".tif")
-                                    || s.EndsWith(".pdf")
-                                    //|| s.EndsWith(".doc")
-                                    //|| s.EndsWith(".fax")
-                                    //|| s.EndsWith(".txt")
-                                    ).ToList();
+                List<string> files = new List<string>();
 
+                string f_list = LogFileDir + "\\msh_v2_lists_temp\\" + f_name;
+                try
+                {
+                    if (!File.Exists(f_list))
+                    {
+                        if (!Directory.Exists(LogFileDir + "\\msh_v2_lists_temp\\"))
+                            Directory.CreateDirectory(LogFileDir + "\\msh_v2_lists_temp\\");
+                        files = Directory.EnumerateFiles(BaseDir, "*.*", SearchOption.AllDirectories).Where(
+                                            s => s.EndsWith(".tif")
+                                            || s.EndsWith(".pdf")
+                                            || s.EndsWith(".blob")
+                                            //|| s.EndsWith(".doc") // if we needed other files
+                                            //|| s.EndsWith(".fax")
+                                            //|| s.EndsWith(".txt")
+                                            ).ToList();
+                        Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
+                        {
+                            ProgressLine = "Writing lines into file...";
+                        }));
+                        File.WriteAllLines(f_list, files);
+                    }
+                    else
+                    {
+                        foreach (string l in File.ReadAllLines(f_list))
+                        {
+                            files.Add(l);
+                        }
+                    }
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
                 {
-                    elerut.Text = "Comparing files...";
+                    ProgressLine = "Comparing files...";
+                    FilesInFolder = files.Count();
                 }));
 
+                int mCnt = 0;
                 foreach (string d in datarows)
                 {
+                    #region new method
+                    //string f_name = BaseDir + "\\" + d;
+                    //if(File.Exists(BaseDir+d)) // if file exist in target directory
+                    //{
+                    //    Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
+                    //    {
+                    //        ++fCnt;
+                    //        Add_Found_files(d);
+                    //        Found = fCnt;
+                    //    }));
+                    //}
+                    //else  // if not exist
+                    //{
+                    //    Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
+                    //    {
+                    //        ++mCnt;
+                    //        Add_Errorlist_dir(d);
+                    //        Missing = mCnt;
+                    //    }));
+                    //}
+                    #endregion
+
                     bool megvan = false;
                     foreach (string f in files)
                     {
@@ -353,7 +403,6 @@ namespace MissingFiles_V2
                             Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
                             {
                                 Add_Found_files(d);
-                                Found = _found_files.Count();
                             }));
                             files.Remove(f);
                             break;
@@ -363,10 +412,12 @@ namespace MissingFiles_V2
                     {
                         Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, new Action(() =>
                         {
+                            ++mCnt;
                             Add_Errorlist_dir(d);
-                            Missing = _errorlist_dir.Count();
+                            Missing = mCnt;
                         }));
                     }
+                    ++Fullcnt;
                 }
 
             }).ContinueWith((a) =>
@@ -375,9 +426,12 @@ namespace MissingFiles_V2
                     new Action(() =>
                     {
                         Keres = false;
-                        if (Missing > 0) File.WriteAllLines(LogFileDir + @"\MissingFilesHunter.log", Errorlist_dir);
-                        else File.WriteAllText(LogFileDir + @"\MissingFilesHunter.log", DateTime.UtcNow.ToString() + " No missing file.");
-                        elerut.Text = "Finished.";
+                        string[] tmp = f_name.Split('_');
+                        string temp = tmp[tmp.Count() - 1];
+                        string log_f_name = LogFileDir +"\\Missing_Files_Hunter_" + Path.ChangeExtension(temp,".log");
+                        if (Missing > 0) File.WriteAllLines(log_f_name, Errorlist_dir);
+                        else File.WriteAllText(log_f_name, DateTime.UtcNow.ToString() + " No missing file.");
+                        ProgressLine = "Finished.";
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             Mouse.OverrideCursor = Cursors.Arrow;
@@ -386,6 +440,17 @@ namespace MissingFiles_V2
                         MessageBox.Show("Finished!");
                     }));
             });
+        }
+
+        private void InitCounters()
+        {
+            FilesInFolder = 0;
+            Missing = 0;
+            DbRowsCount = 0;
+            Fullcnt = 0;
+            datarows.Clear();
+            _found_files.Clear();
+            _errorlist_dir.Clear();
         }
 
         private void execMoveWindow(object sender, MouseButtonEventArgs e)
@@ -425,7 +490,10 @@ namespace MissingFiles_V2
                         myReader.Dispose();
                     }
                 }
-                DbRows = datarows.Count();
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    DbRowsCount = datarows.Count();
+                });
             }
             catch (Exception ex)
             {
